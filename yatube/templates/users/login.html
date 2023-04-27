@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Войти{% endblock %}
+{% block content %}
+{% include "includes/in_form.html" with card_header="Войти на сайт" button_text="Войти" href_text="Забыли пароль?" href_url="users:password_reset" %}
+{% endblock %} 

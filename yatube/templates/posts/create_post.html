@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}
+{% if post_id %}
+Редактирование записи
+{% else %}
+Новая запись
+{% endif %}
+{% endblock  %}
+{% block content %}
+{% if post_id %}
+  {% include "includes/in_form.html" with card_header="Редактировать запись" button_text="Сохранить" %}
+{% else %}
+  {% include "includes/in_form.html" with card_header="Добавить запись" button_text="Добавить" %}
+{% endif %}
+{% endblock  %}

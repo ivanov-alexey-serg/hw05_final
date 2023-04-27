@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+<style>
+   .cell {
+    border-radius: 10px;
+    border: 3px solid;
+   }
+</style>
+<div class="row gx-1 gy-1">
+    <div class="col-12 col-md-8" style="background: white;">
+        <div class="p-3 bg-light cell">
+            <h3>Обо мне</h3>
+            <p>
+                Меня зовут - Алексей! Мне 23 года. На  данный момент
+                я являюсь студентом 61 когорты на направлении "Python-разработчик" 
+                в Яндекс.Практикум и одновременно осваиваю знания на 6 курсе МГТУ им. Н.Э.Баумана
+                по специальности "Подъёмно-транспортные системы". В период моего обучения в 
+                университете, сфера программирования заинтересовала меня, так как многие мои 
+                знакомые и друзья занимаются этой деятельностью. Недавно я принял решение полностью
+                нацелить свое внимание на приобретение новых знаний и углублённое изучение нового 
+                и захватывающего направления. Я испытываю удовольствие от получения нового опыта и 
+                расширения области своих знаний. 
+            </p>
+        </div>   
+    </div>
+    
+    <div class="col-12 col-md-4">
+        <div class="row gx-1 gy-1">
+            <div class="col-4">
+                <div class="p-3 cell" style="background: lightskyblue;">
+                    <a href="https://vk.com/ivanov.alexey.serg">
+                        <img src="{% static 'img/vk_logo.png' %}" style="object-fit: cover; width: 100%;
+                        height: 100%;">
+                    </a>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-3 cell" style="background: lightskyblue">
+                    <a href="https://t.me/ivanov_alexey_serg">
+                        <img src="{% static 'img/telegram_logo.png' %}" style="object-fit: cover; width: 100%;
+                        height: 100%;">
+                    </a>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="p-3 cell" style="background: lightskyblue">
+                    <a href="https://github.com/ivanov-alexey-serg">
+                        <img src="{% static 'img/github_logo.png' %}" style="object-fit: cover; width: 100%;
+                        height: 100%;">
+                    </a>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="cell" style="background: lightskyblue; display: flex;
+                justify-content: center; align-items: center;">
+                    <h3>
+                        <span style="color:red ">Ко</span>тиков не будет 😢
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
