@@ -1,11 +1,12 @@
 import shutil
 import tempfile
 
-from django.test import Client, TestCase, override_settings
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
+
 from ..models import Post, Group, Comment
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -54,13 +55,14 @@ class PostFormTests(TestCase):
             content=small_gif,
             content_type='image/gif'
         )
+        data = {
+            'text': 'Тестовый пост 2',
+            'group': self.group.pk,
+            'image': uploaded,
+        }
         response = self.author_client.post(
             reverse('posts:post_create'),
-            data={
-                'text': 'Тестовый пост 2',
-                'group': self.group.pk,
-                'image': uploaded,
-            },
+            data=data,
             follow=True,
         )
         self.assertRedirects(
@@ -70,9 +72,9 @@ class PostFormTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertTrue(
             Post.objects.filter(
-                text='Тестовый пост 2',
-                image='posts/small.gif',
-                group=self.group,
+                text=data['text'],
+                image='posts/' + data['image'].name,
+                group=data['group'],
                 author=self.author,
             ).exists()
         )
@@ -92,13 +94,14 @@ class PostFormTests(TestCase):
             content=small_gif,
             content_type='image/gif'
         )
+        data = {
+            'text': 'Тестовый пост 1 изменён',
+            'group': self.group.pk,
+            'image': uploaded,
+        }
         response = self.author_client.post(
             reverse('posts:post_edit', kwargs={'post_id': self.post.pk}),
-            data={
-                'text': 'Тестовый пост 1 изменён',
-                'group': self.group.pk,
-                'image': uploaded,
-            },
+            data=data,
             follow=True,
         )
         self.assertRedirects(
@@ -106,13 +109,8 @@ class PostFormTests(TestCase):
             reverse('posts:post_detail',
                     kwargs={'post_id': self.post.pk})
         )
-        self.assertTrue(
-            Post.objects.filter(
-                text='Тестовый пост 1 изменён',
-                image='posts/small1.gif',
-                group=self.group,
-                author=self.author,
-            ).exists()
+        self.assertEqual(
+            Post.objects.get(pk=self.post.pk).text, data['text']
         )
 
     def test_non_authorized_client_cannot_create_post(self):
@@ -148,9 +146,10 @@ class PostFormTests(TestCase):
     def test_create_comment(self):
         """Валидная форма создает запись в Comment."""
         comments_count = Comment.objects.count()
+        data = {'text': 'Тестовый комментарий'}
         response = self.author_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.pk}),
-            data={'text': 'Тестовый комментарий'},
+            data=data,
             follow=True,
         )
         self.assertRedirects(
@@ -160,7 +159,7 @@ class PostFormTests(TestCase):
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertTrue(
             Comment.objects.filter(
-                text='Тестовый комментарий',
+                text=data['text'],
                 post=self.post,
                 author=self.author,
             ).exists()

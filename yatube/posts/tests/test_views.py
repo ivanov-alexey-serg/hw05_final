@@ -1,7 +1,6 @@
+from http import HTTPStatus
 import shutil
 import tempfile
-
-from http import HTTPStatus
 
 from django import forms
 from django.conf import settings
@@ -155,51 +154,46 @@ class PostPagesTests(TestCase):
             group=group_2,
         )
         response = self.author_client.get(reverse(
-            'posts:group_list', kwargs={'slug': 'test-slug'}
+            'posts:group_list', kwargs={'slug': self.group.slug}
         ))
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_index_page_uses_cache(self):
         """Кеширование записей на главной странице."""
         cache.clear()
+        text = 'Пост для тестирования кэша'
         post = Post.objects.create(
-            text='Пост для тестирования кэша',
+            text=text,
             author=self.author
         )
         self.author_client.get(reverse('posts:index'))
         post.delete()
         response = self.author_client.get(reverse('posts:index'))
-        self.assertTrue(
-            'Пост для тестирования кэша' in response.content.decode()
-        )
+        self.assertTrue(text in response.content.decode())
         cache.clear()
         response = self.author_client.get(reverse('posts:index'))
+        self.assertFalse(text in response.content.decode())
 
-    def test_authorized_user_followes_and_unfollowes_to_other_users(self):
-        """Авторизованный пользователь может подписаться/отписаться на/от
+    def test_authorized_user_followes_to_other_users(self):
+        """Авторизованный пользователь может подписаться на
         других пользователей."""
-        self.assertFalse(
-            Follow.objects.filter(user=self.author).filter(author=self.author2)
-        )
-        self.author_client.get(
-            reverse('posts:profile_follow',
-                    kwargs={'username': self.author2.username})
-        )
-        self.author_client.get(
-            reverse('posts:profile_follow',
-                    kwargs={'username': self.author2.username})
-        )
+        self.assertFalse(self.author.follower.filter(author=self.author2))
+        self.author_client.get(reverse('posts:profile_follow',
+                               kwargs={'username': self.author2.username}))
+        self.author_client.get(reverse('posts:profile_follow',
+                               kwargs={'username': self.author2.username}))
         self.assertEqual(
-            Follow.objects.filter(user=self.author)
-            .filter(author=self.author2).count(), 1
+            self.author.follower.filter(author=self.author2).count(), 1
         )
-        self.author_client.get(
-            reverse('posts:profile_unfollow',
-                    kwargs={'username': self.author2.username})
-        )
-        self.assertFalse(
-            Follow.objects.filter(user=self.author).filter(author=self.author2)
-        )
+
+    def test_authorized_user_unfollowes_from_other_users(self):
+        """Авторизованный пользователь может отписаться от
+        других пользователей."""
+        Follow.objects.get_or_create(user=self.author, author=self.author2)
+        self.assertTrue(self.author.follower.filter(author=self.author2))
+        self.author_client.get(reverse('posts:profile_unfollow',
+                               kwargs={'username': self.author2.username}))
+        self.assertFalse(self.author.follower.filter(author=self.author2))
 
     def test_new_post_in_follow_page(self):
         """Новая запись появляется в ленте подписанных пользователей."""
