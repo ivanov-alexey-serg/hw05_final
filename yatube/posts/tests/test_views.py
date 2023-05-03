@@ -177,7 +177,9 @@ class PostPagesTests(TestCase):
     def test_authorized_user_followes_to_other_users(self):
         """Авторизованный пользователь может подписаться на
         других пользователей."""
-        self.assertFalse(self.author.follower.filter(author=self.author2))
+        self.assertFalse(
+            self.author.follower.filter(author=self.author2).exists()
+        )
         self.author_client.get(reverse('posts:profile_follow',
                                kwargs={'username': self.author2.username}))
         self.author_client.get(reverse('posts:profile_follow',
@@ -190,10 +192,14 @@ class PostPagesTests(TestCase):
         """Авторизованный пользователь может отписаться от
         других пользователей."""
         Follow.objects.get_or_create(user=self.author, author=self.author2)
-        self.assertTrue(self.author.follower.filter(author=self.author2))
+        self.assertTrue(
+            self.author.follower.filter(author=self.author2).exists()
+        )
         self.author_client.get(reverse('posts:profile_unfollow',
                                kwargs={'username': self.author2.username}))
-        self.assertFalse(self.author.follower.filter(author=self.author2))
+        self.assertFalse(
+            self.author.follower.filter(author=self.author2).exists()
+        )
 
     def test_new_post_in_follow_page(self):
         """Новая запись появляется в ленте подписанных пользователей."""

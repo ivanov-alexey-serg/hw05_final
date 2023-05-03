@@ -109,8 +109,13 @@ class PostFormTests(TestCase):
             reverse('posts:post_detail',
                     kwargs={'post_id': self.post.pk})
         )
-        self.assertEqual(
-            Post.objects.get(pk=self.post.pk).text, data['text']
+        self.assertTrue(
+            Post.objects.filter(
+                text=data['text'],
+                image='posts/' + data['image'].name,
+                group=data['group'],
+                author=self.author,
+            ).exists()
         )
 
     def test_non_authorized_client_cannot_create_post(self):
